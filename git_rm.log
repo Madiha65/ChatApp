@@ -1,0 +1,7 @@
+﻿git : fatal: pathspec 'client/node_modules' did not match any files
+At line:1 char:45
++ ... \Chat App"; git rm -r --cached -- client/node_modules server/node_mod ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (fatal: pathspec...match any files:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
