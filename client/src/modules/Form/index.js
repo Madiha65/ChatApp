@@ -3,6 +3,7 @@ import { useState } from "react"
 import Button from "../../components/Button"
 import Input from "../../components/Input"
 import { useNavigate } from 'react-router-dom'
+import BASE_URL from '../../config';
 
 const Form = ({
     isSignInPage = true,
@@ -19,7 +20,7 @@ const Form = ({
     const handleSubmit = async (e) => {
         console.log('data :>> ', data);
         e.preventDefault()
-        const res = await fetch(`https://your-backend.onrender.com/api/${isSignInPage ? 'login' : 'register'}`, {
+        const res = await fetch(`${BASE_URL}/api/${isSignInPage ? 'login' : 'register'}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

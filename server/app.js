@@ -1,10 +1,15 @@
-// nodemon trigger
+// server\app.js
 require('dotenv').config();
 const express = require('express');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
-const io = require('socket.io')(8080, {
+
+
+const http = require('http');
+const server = http.createServer(app);
+
+const io = require('socket.io')(server, {
     cors: {
         origin: '*',
     }
@@ -43,25 +48,24 @@ io.on('connection', socket => {
         const receiver = users.find(user => user.userId === receiverId);
         const sender = users.find(user => user.userId === senderId);
         const user = await Users.findById(senderId);
-        if (!user) {
-            console.warn('sendMessage: sender not found', senderId);
-            return socket.emit('errorMessage', { error: 'Sender not found' });
-        }
-
-        const payload = {
-            senderId,
-            message,
-            conversationId,
-            receiverId,
-            user: { id: user._id, fullName: user.fullName, email: user.email }
-        };
-
+        console.log('sender :>> ', sender, receiver);
         if (receiver) {
-            io.to(receiver.socketId).emit('getMessage', payload);
+            io.to(receiver.socketId).to(sender.socketId).emit('getMessage', {
+                senderId,
+                message,
+                conversationId,
+                receiverId,
+                user: { id: user._id, fullName: user.fullName, email: user.email }
+            });
+        } else {
+            io.to(sender.socketId).emit('getMessage', {
+                senderId,
+                message,
+                conversationId,
+                receiverId,
+                user: { id: user._id, fullName: user.fullName, email: user.email }
+            });
         }
-
-        const senderSocketId = sender?.socketId || socket.id;
-        io.to(senderSocketId).emit('getMessage', payload);
     });
 
     socket.on('disconnect', () => {
@@ -226,6 +230,6 @@ app.get('/api/users/:userId', async (req, res) => {
     }
 })
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log('listening on port ' + port);
 })

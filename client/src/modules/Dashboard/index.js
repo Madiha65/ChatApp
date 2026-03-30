@@ -4,6 +4,9 @@ import Img1 from '../../assets/img1.jpg'
 import tutorialsdev from '../../assets/tutorialsdev.png'
 import Input from '../../components/Input'
 import { io } from 'socket.io-client'
+import BASE_URL from '../../config';
+
+
 
 const Dashboard = () => {
 	const [user, setUser] = useState(JSON.parse(localStorage.getItem('user:detail')))
@@ -15,7 +18,7 @@ const Dashboard = () => {
 	const messageRef = useRef(null)
 
 	useEffect(() => {
-		setSocket(io('https://your-backend.onrender.com'))
+		setSocket(io(BASE_URL))
 	}, [])
 
 	useEffect(() => {
@@ -38,7 +41,7 @@ const Dashboard = () => {
 	useEffect(() => {
 		const loggedInUser = JSON.parse(localStorage.getItem('user:detail'))
 		const fetchConversations = async () => {
-			const res = await fetch(`https://your-backend.onrender.com/api/conversations/${loggedInUser?.id}`, {
+			const res = await fetch(`${BASE_URL}/api/conversations/${loggedInUser?.id}`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
@@ -52,7 +55,7 @@ const Dashboard = () => {
 
 	useEffect(() => {
 		const fetchUsers = async () => {
-			const res = await fetch(`https://your-backend.onrender.com/api/users/${user?.id}`, {
+			const res = await fetch(`${BASE_URL}/api/users/${user?.id}`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
@@ -65,7 +68,7 @@ const Dashboard = () => {
 	}, [])
 
 	const fetchMessages = async (conversationId, receiver) => {
-		const res = await fetch(`https://your-backend.onrender.com/api/message/${conversationId}?senderId=${user?.id}&&receiverId=${receiver?.receiverId}`, {
+		const res = await fetch(`${BASE_URL}/api/message/${conversationId}?senderId=${user?.id}&&receiverId=${receiver?.receiverId}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -83,7 +86,7 @@ const Dashboard = () => {
 			message,
 			conversationId: messages?.conversationId
 		});
-		const res = await fetch(`https://your-backend.onrender.com/api/message`, {
+		const res = await fetch(`${BASE_URL}/api/message`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
