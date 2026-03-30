@@ -43,24 +43,25 @@ io.on('connection', socket => {
         const receiver = users.find(user => user.userId === receiverId);
         const sender = users.find(user => user.userId === senderId);
         const user = await Users.findById(senderId);
-        console.log('sender :>> ', sender, receiver);
-        if (receiver) {
-            io.to(receiver.socketId).to(sender.socketId).emit('getMessage', {
-                senderId,
-                message,
-                conversationId,
-                receiverId,
-                user: { id: user._id, fullName: user.fullName, email: user.email }
-            });
-        } else {
-            io.to(sender.socketId).emit('getMessage', {
-                senderId,
-                message,
-                conversationId,
-                receiverId,
-                user: { id: user._id, fullName: user.fullName, email: user.email }
-            });
+        if (!user) {
+            console.warn('sendMessage: sender not found', senderId);
+            return socket.emit('errorMessage', { error: 'Sender not found' });
         }
+
+        const payload = {
+            senderId,
+            message,
+            conversationId,
+            receiverId,
+            user: { id: user._id, fullName: user.fullName, email: user.email }
+        };
+
+        if (receiver) {
+            io.to(receiver.socketId).emit('getMessage', payload);
+        }
+
+        const senderSocketId = sender?.socketId || socket.id;
+        io.to(senderSocketId).emit('getMessage', payload);
     });
 
     socket.on('disconnect', () => {
