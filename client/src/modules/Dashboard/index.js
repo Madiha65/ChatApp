@@ -9,7 +9,7 @@ import BASE_URL from '../../config';
 
 
 const Dashboard = () => {
-	const [user, setUser] = useState(JSON.parse(localStorage.getItem('user:detail')))
+	const [user] = useState(JSON.parse(localStorage.getItem('user:detail')))
 	const [conversations, setConversations] = useState([])
 	const [messages, setMessages] = useState({})
 	const [message, setMessage] = useState('')
@@ -32,7 +32,7 @@ const Dashboard = () => {
 				messages: [...prev.messages, { user: data.user, message: data.message }]
 			}))
 		})
-	}, [socket])
+	}, [ socket, user?.id])
 
 	useEffect(() => {
 		messageRef?.current?.scrollIntoView({ behavior: 'smooth' })
@@ -65,7 +65,7 @@ const Dashboard = () => {
 			setUsers(resData)
 		}
 		fetchUsers()
-	}, [])
+	}, [ user?.id])
 
 	const fetchMessages = async (conversationId, receiver) => {
 		const res = await fetch(`${BASE_URL}/api/message/${conversationId}?senderId=${user?.id}&&receiverId=${receiver?.receiverId}`, {
@@ -86,7 +86,7 @@ const Dashboard = () => {
 			message,
 			conversationId: messages?.conversationId
 		});
-		const res = await fetch(`${BASE_URL}/api/message`, {
+		await fetch(`${BASE_URL}/api/message`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -104,7 +104,7 @@ const Dashboard = () => {
 		<div className='w-screen flex'>
 			<div className='w-[25%] h-screen bg-secondary overflow-scroll'>
 				<div className='flex items-center my-8 mx-14'>
-					<div><img src={tutorialsdev} width={75} height={75} className='border border-primary p-[2px] rounded-full' /></div>
+				<div><img src={tutorialsdev} width={75} height={75} alt="User profile" className='border border-primary p-[2px] rounded-full' /></div>
 					<div className='ml-8'>
 						<h3 className='text-2xl'>{user?.fullName}</h3>
 						<p className='text-lg font-light'>My Account</p>
@@ -120,7 +120,7 @@ const Dashboard = () => {
 									return (
 										<div key={conversationId || index} className='flex items-center py-8 border-b border-b-gray-300'>
 											<div className='cursor-pointer flex items-center' onClick={() => fetchMessages(conversationId, user)}>
-												<div><img src={Img1} className="w-[60px] h-[60px] rounded-full p-[2px] border border-primary" /></div>
+												<div><img src={Img1} alt={user?.fullName} className="w-[60px] h-[60px] rounded-full p-[2px] border border-primary" /></div>
 												<div className='ml-6'>
 													<h3 className='text-lg font-semibold'>{user?.fullName}</h3>
 													<p className='text-sm font-light text-gray-600'>{user?.email}</p>
@@ -137,7 +137,7 @@ const Dashboard = () => {
 				{
 					messages?.receiver?.fullName &&
 					<div className='w-[75%] bg-secondary h-[80px] my-14 rounded-full flex items-center px-14 py-2'>
-						<div className='cursor-pointer'><img src={Img1} width={60} height={60} className="rounded-full" /></div>
+						<div className='cursor-pointer'><img src={Img1} width={60} height={60} className="rounded-full" alt={messages?.receiver?.fullName} /></div>
 						<div className='ml-6 mr-auto'>
 							<h3 className='text-lg'>{messages?.receiver?.fullName}</h3>
 							<p className='text-sm font-light text-gray-600'>{messages?.receiver?.email}</p>
@@ -198,7 +198,7 @@ const Dashboard = () => {
 								return (
 									<div key={index} className='flex items-center py-8 border-b border-b-gray-300'>
 										<div className='cursor-pointer flex items-center' onClick={() => fetchMessages('new', user)}>
-											<div><img src={Img1} className="w-[60px] h-[60px] rounded-full p-[2px] border border-primary" /></div>
+											<div><img src={Img1} alt={user?.fullName} className="w-[60px] h-[60px] rounded-full p-[2px] border border-primary" /></div>
 											<div className='ml-6'>
 												<h3 className='text-lg font-semibold'>{user?.fullName}</h3>
 												<p className='text-sm font-light text-gray-600'>{user?.email}</p>
