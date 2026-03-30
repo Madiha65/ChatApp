@@ -1,4 +1,6 @@
 // client/src/config.js
-const BASE_URL = "https://your-backend.onrender.com";
+
+const BASE_URL =
+  process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 export default BASE_URL;

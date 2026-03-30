@@ -4,11 +4,28 @@ const express = require('express');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
-
-
 const http = require('http');
+
+// ✅ FIRST create app
+const app = express();
+
+
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://chat-app-rust-beta.vercel.app'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
+
+app.options('*', cors()); // ✅ FIXES PREFLIGHT
+
+
+// ✅ THEN create server
 const server = http.createServer(app);
 
+// ✅ THEN socket
 const io = require('socket.io')(server, {
     cors: {
         origin: '*',
@@ -24,10 +41,9 @@ const Conversations = require('./models/Conversations');
 const Messages = require('./models/Messages');
 
 // app Use
-const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors());
+
 
 const port = process.env.PORT || 8000;
 
