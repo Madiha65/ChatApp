@@ -13,7 +13,7 @@ const app = express();
 app.use(cors({
   origin: [
     'http://localhost:3000',
-    'https://chat-app-o9o3.vercel.app/'
+    'https://chat-app-o9o3.vercel.app'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
@@ -96,31 +96,44 @@ app.get('/', (req, res) => {
     res.send('Welcome');
 })
 
-app.post('/api/register', async (req, res, next) => {
+app.post('/api/register', async (req, res) => {
     try {
         const { fullName, email, password } = req.body;
 
+        // Validation
         if (!fullName || !email || !password) {
-            res.status(400).send('Please fill all required fields');
-        } else {
-            const isAlreadyExist = await Users.findOne({ email });
-            if (isAlreadyExist) {
-                res.status(400).send('User already exists');
-            } else {
-                const newUser = new Users({ fullName, email });
-                bcryptjs.hash(password, 10, (err, hashedPassword) => {
-                    newUser.set('password', hashedPassword);
-                    newUser.save();
-                    next();
-                })
-                return res.status(200).send('User registered successfully');
-            }
+            return res.status(400).send('Please fill all required fields');
         }
 
+        // Check existing user
+        const isAlreadyExist = await Users.findOne({ email });
+        if (isAlreadyExist) {
+            return res.status(400).send('User already exists');
+        }
+
+        // Hash password
+        const hashedPassword = await bcryptjs.hash(password, 10);
+if (!hashedPassword) {
+    return res.status(500).send('Password hashing failed');
+}
+        // Create user
+        const newUser = new Users({
+            fullName,
+            email,
+            password: hashedPassword
+        });
+
+        // Save user
+        await newUser.save();
+
+        // Response
+        return res.status(200).send('User registered successfully');
+
     } catch (error) {
-        console.log(error, 'Error')
+        console.log(error, 'Error');
+        return res.status(500).send('Server error');
     }
-})
+});
 
 app.post('/api/login', async (req, res, next) => {
     try {
